@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<tag name="iManga">
+    <dbloop name="chapter" tables="fs_comics;fs_chapters;fs_teams" filters="fs_chapters.uniqid=rvalue(GET, chapter)">
+        <tag name="chapter">
+            <attribute name="manga" value="dbvalue(chapter, fs_comics.uniqid)" />
+            <attribute name="volume" value="dbvalue(chapter, fs_chapters.volume)" />
+            <attribute name="created" value="strtotime(dbvalue(chapter, fs_chapters.created))" />
+            <attribute name="updated" value="strtotime(dbvalue(chapter, fs_chapters.updated))" />
+            <tag name="id"><value value="dbvalue(chapter, fs_chapters.uniqid)" /></tag>
+            <tag name="number"><value value="dbvalue(chapter, fs_chapters.chapter)" /></tag>
+            <tag name="name"><value value="dbvalue(chapter, fs_chapters.name)" /></tag>
+            <tag name="licenced"><value value="0" /></tag>
+            <tag name="team"><value value="dbvalue(chapter, fs_teams.name)" /></tag>
+            <tag name="images">
+                <dbloop name="pages" tables="fs_comics;fs_chapters;fs_pages" filters="fs_chapters.uniqid=rvalue(GET, chapter)">
+                    <tag name="image"><value value="concat(param(site.uri.pages), dbvalue(pages, fs_comics.stub), _, dbvalue(pages, fs_comics.uniqid), /, dbvalue(pages, fs_chapters.stub), _, dbvalue(pages, fs_chapters.uniqid), /, dbvalue(pages, fs_pages.filename))" /></tag>
+                </dbloop>
+            </tag>
+        </tag>
+    </dbloop>
+</tag>
+

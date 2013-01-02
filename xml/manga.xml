@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<tag name="iManga">
+    <dbloop name="manga" tables="fs_comics" filters="fs_comics.uniqid=rvalue(GET, manga)">
+        <tag name="manga">
+            <attribute name="created" value="strtotime(dbvalue(manga, fs_comics.created))" />
+            <attribute name="updated" value="strtotime(dbvalue(manga, fs_comics.updated))" />
+            <tag name="id"><value value="dbvalue(manga, fs_comics.uniqid)" /></tag>
+            <tag name="name"><value value="dbvalue(manga, fs_comics.name)" /></tag>
+            <tag name="author"><value value="line(Auteur, dbvalue(manga, fs_comics.description))" /></tag>
+            <tag name="editor"><value value="line(Editeur, dbvalue(manga, fs_comics.description))" /></tag>
+            <tag name="image"><value value="concat(param(site.uri.pages), dbvalue(manga, fs_comics.stub), _, dbvalue(manga, fs_comics.uniqid), /thumb_, dbvalue(manga, fs_comics.thumbnail))" /></tag>
+            <tag name="status"><value value="" /></tag>
+            <tag name="synopsis"><value value="line(Synopsis, dbvalue(manga, fs_comics.description))" /></tag>
+            <tag name="kind"><value value="line(Genre, dbvalue(manga, fs_comics.description))" /></tag>
+            <tag name="subkinds">
+                <vloop name="subkinds" value="line(Sous-genre, dbvalue(manga, fs_comics.description))" separator=",">
+                    <tag name="subkind"><value value="ucfirst(trim(trim(vvalue(subkinds)), .))" /></tag>
+                </vloop>
+            </tag>
+        </tag>
+    </dbloop>
+</tag>
+

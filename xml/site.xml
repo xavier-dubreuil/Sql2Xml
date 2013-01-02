@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<tag name="iManga">
+    <tag name="site">
+        <tag name="name"><value value="param(site.name)" /></tag>
+        <tag name="home"><value value="param(site.uri.home)" /></tag>
+        <tag name="uri"><value value="param(site.uri.uri)" /></tag>
+        <tag name="mangas"><value value="param(site.uri.mangas)" /></tag>
+        <tag name="chapters"><value value="param(site.uri.chapters)" /></tag>
+    </tag>
+</tag>
