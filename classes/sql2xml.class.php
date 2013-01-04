@@ -49,7 +49,8 @@ class sql2xml
             }
             $par->appendChild($tag);
         } else if ($src->tagName == 'value') {
-            $par->nodeValue = $this->getValue($src->attributes->getNamedItem('value')->value);
+            //$par->nodeValue = $this->getValue($src->attributes->getNamedItem('value')->value);
+            $par->appendChild($this->destDOM->createTextNode($this->getValue($src->attributes->getNamedItem('value')->value)));
         } else if ($src->tagName == 'attribute') {
             $att = $this->destDOM->createAttribute($src->attributes->getNamedItem('name')->value);
             $att->value = $this->getValue($src->attributes->getNamedItem('value')->value);

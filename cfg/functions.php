@@ -8,6 +8,7 @@ function line($start, $field)
             return trim(substr($item, strpos($item, ':')+1));
         }
     }
+    return null;
 }
 
 ?>
