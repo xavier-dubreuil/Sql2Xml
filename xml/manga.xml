@@ -2,9 +2,8 @@
 <tag name="iManga">
     <dbloop name="manga" tables="fs_comics" filters="fs_comics.uniqid=rvalue(GET, manga)">
         <tag name="manga">
-            <attribute name="created" value="strtotime(dbvalue(manga, fs_comics.created))" />
-            <attribute name="updated" value="strtotime(dbvalue(manga, fs_comics.updated))" />
             <tag name="id"><value value="dbvalue(manga, fs_comics.uniqid)" /></tag>
+            <tag name="updated"><value value="max(strtotime(dbvalue(manga, fs_comics.created)),strtotime(dbvalue(manga, fs_comics.updated)))" /></tag>
             <tag name="name"><value value="dbvalue(manga, fs_comics.name)" /></tag>
             <tag name="author"><value value="line(Auteur, dbvalue(manga, fs_comics.description))" /></tag>
             <tag name="editor"><value value="line(Editeur, dbvalue(manga, fs_comics.description))" /></tag>

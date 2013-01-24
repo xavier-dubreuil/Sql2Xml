@@ -98,7 +98,32 @@ class sql2xml
                     }
                 }
             }
-        
+        } else if ($src->tagName == 'if') {
+            $condition = $this->getValue($src->attributes->getNamedItem('condition')->value);
+            $operator  = $this->getValue($src->attributes->getNamedItem('operator')->value);
+            $value     = $this->getValue($src->attributes->getNamedItem('value')->value);
+            $flg = false;
+            
+            if ($operator == '>' && $condition > $value) {
+                $flg = true;
+            } else if ($operator == '>=' && $condition >= $value) {
+                $flg = true;
+            } else if ($operator == '<' && $condition < $value) {
+                $flg = true;
+            } else if ($operator == '<=' && $condition <= $value) {
+                $flg = true;
+            } else if ($operator == '=' && $condition == $value) {
+                $flg = true;
+            } else if ($operator == '!=' && $condition != $value) {
+                $flg = true;
+            }
+            if ($flg) {
+                foreach ($src->childNodes as $child) {
+                    if ($child instanceOf DOMElement) {
+                        $this->generateTag($child, $par);
+                    }
+                }
+            }
         }
     }
 
