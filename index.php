@@ -1,6 +1,6 @@
 <?php
 
-//header('content-type: text/xml');
+header('content-type: text/xml');
 
 include 'classes/database.class.php';
 include 'classes/sql2xml.class.php';
