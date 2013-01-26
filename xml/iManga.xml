@@ -1,0 +1,85 @@
+<?xml version="1.0" ?>
+<tag name="iManga">
+    <if condition="is_null(rvalue(GET, manga))" operator="=" value="1">
+        <if condition="is_null(rvalue(GET, chapter))" operator="=" value="1">
+            <tag name="site">
+                <tag name="name"><value value="param(site.name)" /></tag>
+                <tag name="home"><value value="param(site.uri.home)" /></tag>
+                <tag name="uri"><value value="param(site.uri.uri)" /></tag>
+                <tag name="updated"><value value="time()" /></tag>
+            </tag>
+            <tag name="mangas">
+                <dbloop name="manga" tables="fs_comics" filters="">
+                    <if condition="max(strtotime(dbvalue(manga, fs_comics.created)),strtotime(dbvalue(manga, fs_comics.updated)))" operator=">" value="rvalue(GET, updated)">
+                        <tag name="manga">
+                            <attribute name="id" value="dbvalue(manga, fs_comics.uniqid)" />
+                            <attribute name="updated" value="max(strtotime(dbvalue(manga, fs_comics.created)),strtotime(dbvalue(manga, fs_comics.updated)))" />
+                            <attribute name="uri" value="concat(param(site.uri.uri), ?manga=, dbvalue(manga, fs_comics.uniqid))" />
+                        </tag>
+                    </if>
+                </dbloop>
+                <test />
+            </tag>
+            <tag name="chapters">
+                <dbloop name="chapter" tables="fs_chapters" filters="">
+                    <if condition="max(strtotime(dbvalue(chapter, fs_chapters.created)),strtotime(dbvalue(chapter, fs_chapters.updated)))" operator=">" value="rvalue(GET, updated)">
+                        <tag name="chapter">
+                            <attribute name="id" value="dbvalue(chapter, fs_chapters.uniqid)" />
+                            <attribute name="updated" value="max(strtotime(dbvalue(chapter, fs_chapters.created)),strtotime(dbvalue(chapter, fs_chapters.updated)))" />
+                            <attribute name="uri" value="concat(param(site.uri.uri), ?chapter=, dbvalue(chapter, fs_chapters.uniqid))" />
+                        </tag>
+                    </if>
+                </dbloop>
+                <test />
+            </tag>
+        </if>
+    </if>
+    <if condition="is_null(rvalue(GET, manga))" operator="=" value="0">
+        <dbloop name="manga" tables="fs_comics" filters="fs_comics.uniqid=rvalue(GET, manga)">
+            <tag name="manga">
+                <tag name="id"><value value="dbvalue(manga, fs_comics.uniqid)" /></tag>
+                <tag name="updated"><value value="max(strtotime(dbvalue(manga, fs_comics.created)),strtotime(dbvalue(manga, fs_comics.updated)))" /></tag>
+                <tag name="name"><value value="dbvalue(manga, fs_comics.name)" /></tag>
+                <tag name="author"><value value="line(Auteur, dbvalue(manga, fs_comics.description))" /></tag>
+                <tag name="editor"><value value="line(Editeur, dbvalue(manga, fs_comics.description))" /></tag>
+                <tag name="image"><value value="concat(param(site.uri.pages), dbvalue(manga, fs_comics.stub), _, dbvalue(manga, fs_comics.uniqid), /thumb_, dbvalue(manga, fs_comics.thumbnail))" /></tag>
+                <tag name="status"><value value="" /></tag>
+                <tag name="synopsis"><value value="line(Synopsis, dbvalue(manga, fs_comics.description))" /></tag>
+                <tag name="kind"><value value="line(Genre, dbvalue(manga, fs_comics.description))" /></tag>
+                <tag name="subkinds">
+                    <vloop name="subkinds" value="line(Sous-genre, dbvalue(manga, fs_comics.description))" separator=",">
+                        <tag name="subkind"><value value="ucfirst(trim(trim(vvalue(subkinds)), .))" /></tag>
+                    </vloop>
+                </tag>
+            </tag>
+        </dbloop>
+    </if>
+    <if condition="is_null(rvalue(GET, chapter))" operator="=" value="0">
+        <dbloop name="chapter" tables="fs_comics;fs_chapters" filters="fs_chapters.uniqid=rvalue(GET, chapter)">
+            <tag name="chapter">
+                <tag name="id"><value value="dbvalue(chapter, fs_chapters.uniqid)" /></tag>
+                <tag name="manga"><value value="dbvalue(chapter, fs_comics.uniqid)" /></tag>
+                <tag name="volume"><value value="dbvalue(chapter, fs_chapters.volume)" /></tag>
+                <tag name="updated"><value value="max(strtotime(dbvalue(chapter, fs_chapters.created)),strtotime(dbvalue(chapter, fs_chapters.updated)))" /></tag>
+                <tag name="number"><value value="dbvalue(chapter, fs_chapters.chapter)" /></tag>
+                <tag name="name"><value value="dbvalue(chapter, fs_chapters.name)" /></tag>
+                <tag name="licenced"><value value="0" /></tag>
+                <tag name="teams">
+                    <dbloop name="joins" tables="fs_chapters;fs_joints" filters="fs_chapters.uniqid=rvalue(GET, chapter)">
+                        <dbloop name="teams" tables="fs_joints;fs_teams" filters="fs_joints.id=dbvalue(joins, fs_joints.id)">
+                            <tag name="team"><value value="dbvalue(teams, fs_teams.name)"/></tag>
+                        </dbloop>
+                    </dbloop>
+                    <dbloop name="teams" tables="fs_chapters;fs_teams" filters="fs_chapters.uniqid=rvalue(GET, chapter)">
+                        <tag name="team"><value value="dbvalue(teams, fs_teams.name)"/></tag>
+                    </dbloop>
+                </tag>
+                <tag name="images">
+                    <dbloop name="pages" tables="fs_comics;fs_chapters;fs_pages" filters="fs_chapters.uniqid=rvalue(GET, chapter)">
+                        <tag name="image"><value value="concat(param(site.uri.pages), dbvalue(pages, fs_comics.stub), _, dbvalue(pages, fs_comics.uniqid), /, dbvalue(pages, fs_chapters.stub), _, dbvalue(pages, fs_chapters.uniqid), /, dbvalue(pages, fs_pages.filename))" /></tag>
+                    </dbloop>
+                </tag>
+            </tag>
+        </dbloop>
+    </if>
+</tag>

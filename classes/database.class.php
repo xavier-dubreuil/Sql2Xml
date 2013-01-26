@@ -44,13 +44,22 @@ class Database
         $user = $dbinfos['username'];
         $pass = empty($dbinfos['password']) ? '' : $dbinfos['password'];
         
-        $this->dbhandler = new PDO($dsn,  $user, $pass);
+        try {
+            $this->dbhandler = new PDO($dsn, $user, $pass);
+        } catch (PDOExcpetion $e) {
+            throw new Exception('Unable to connect to database '.$dbinfos['dbdriver'].':'.$dbinfos['database'].' ('.$dbinfos['username'].'@'.$dbinfos['hostname'].':'.$dbinfos['dbport'].')');
+        }
     }
 
     public function query($request)
     {
-        $statement = $this->dbhandler->query($request);
-        return $statement->fetchAll();
+        $query = $this->dbhandler->query($request);
+        return $query;
+    }
+    
+    public function fetchQuery($statement)
+    {
+        return $query->fetch();
     }
 
 
