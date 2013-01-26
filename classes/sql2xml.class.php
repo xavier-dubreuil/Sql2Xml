@@ -121,7 +121,6 @@ class sql2xml
         $operator  = $this->getValue($src->attributes->getNamedItem('operator')->value);
         $value     = $this->getValue($src->attributes->getNamedItem('value')->value);
         $flg = false;
-        var_dump($condition, $operator, $value);
         if ($operator == '>' && $condition > $value) {
             $flg = true;
         } else if ($operator == '>=' && $condition >= $value) {

@@ -46,8 +46,8 @@ class Database
         
         try {
             $this->dbhandler = new PDO($dsn, $user, $pass);
-        } catch (PDOExcpetion $e) {
-            throw new Exception('Unable to connect to database '.$dbinfos['dbdriver'].':'.$dbinfos['database'].' ('.$dbinfos['username'].'@'.$dbinfos['hostname'].':'.$dbinfos['dbport'].')');
+        } catch (PDOException $e) {
+            throw new Exception('Unable to connect to mysql database : '.$dbinfos['database'].' ('.$dbinfos['username'].'@'.$dbinfos['hostname'].':'.$dbinfos['dbport'].')');
         }
     }
 
