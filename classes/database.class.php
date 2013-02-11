@@ -53,13 +53,17 @@ class Database
 
     public function query($request)
     {
-        $query = $this->dbhandler->query($request);
+        $query = $this->dbhandler->query($request, PDO::FETCH_ASSOC);
         return $query;
     }
     
     public function fetchQuery($statement)
     {
-        return $query->fetch();
+        $res = $statement->fetch();
+        if ($res === false) {
+            $statement->closeCursor();
+        }
+        return $res;
     }
 
 

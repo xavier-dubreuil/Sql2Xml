@@ -6,7 +6,6 @@
                 <tag name="name"><value value="param(site.name)" /></tag>
                 <tag name="home"><value value="param(site.uri.home)" /></tag>
                 <tag name="uri"><value value="param(site.uri.uri)" /></tag>
-                <tag name="updated"><value value="time()" /></tag>
             </tag>
             <tag name="mangas">
                 <dbloop name="manga" tables="fs_comics" filters="">
@@ -42,12 +41,13 @@
                 <tag name="name"><value value="dbvalue(manga, fs_comics.name)" /></tag>
                 <tag name="author"><value value="line(Auteur, dbvalue(manga, fs_comics.description))" /></tag>
                 <tag name="editor"><value value="line(Editeur, dbvalue(manga, fs_comics.description))" /></tag>
+                <tag name="adult"><value value="boolTo(contain(dbvalue(manga, fs_comics.name), -16))" /></tag>
                 <tag name="image"><value value="concat(param(site.uri.pages), dbvalue(manga, fs_comics.stub), _, dbvalue(manga, fs_comics.uniqid), /thumb_, dbvalue(manga, fs_comics.thumbnail))" /></tag>
                 <tag name="status"><value value="" /></tag>
                 <tag name="synopsis"><value value="line(Synopsis, dbvalue(manga, fs_comics.description))" /></tag>
-                <tag name="kind"><value value="line(Genre, dbvalue(manga, fs_comics.description))" /></tag>
+                <tag name="kind"><value value="genre(dbvalue(manga, fs_comics.description))" /></tag>
                 <tag name="subkinds">
-                    <vloop name="subkinds" value="line(Sous-genre, dbvalue(manga, fs_comics.description))" separator=",">
+                    <vloop name="subkinds" value="sousgenre(dbvalue(manga, fs_comics.description))" separator=",">
                         <tag name="subkind"><value value="ucfirst(trim(trim(vvalue(subkinds)), .))" /></tag>
                     </vloop>
                 </tag>
@@ -81,5 +81,14 @@
                 </tag>
             </tag>
         </dbloop>
+    </if>
+    <if condition="is_null(rvalue(GET, memory))" operator="=" value="0">
+        <tag name="memory">
+            <tag name="memory_limit"><value value="ini_get(memory_limit)" /></tag>
+            <tag name="memory_peak"><value value="memory_get_usage(10)" /></tag>
+            <tag name="memory_peak"><value value="memory_get_usage(1)" /></tag>
+            <tag name="memory_peak"><value value="memory_get_peak_usage(0)" /></tag>
+            <tag name="memory_peak"><value value="memory_get_peak_usage(1)" /></tag>
+        </tag>
     </if>
 </tag>

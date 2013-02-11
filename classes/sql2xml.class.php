@@ -5,8 +5,6 @@ class sql2xml
     protected $srcDOM;
     protected $destDOM;
 
-    protected $database;
-    protected $dblinks;
     protected $dbfields;
 
     protected $objects;
@@ -14,14 +12,8 @@ class sql2xml
 
     protected $dbhandler;
 
-    public function __construct($config)
+    public function __construct()
     {
-        $this->database = $config['database'];
-        $this->dblinks  = $config['links'];
-        $this->dbfields = $config['fields'];
-        
-        $this->dbhandler = new Database($this->database, $this->dblinks);
-        
         $this->srcDOM  = new DOMDocument();
         $this->destDOM = new DOMDocument('1.0', 'UTF-8');
 
@@ -29,13 +21,29 @@ class sql2xml
         $this->values = array();
     }
     
-    public function transform($filepath)
+    public function transform($config, $filepath)
     {
+        $this->dbfields = $config['fields'];
+        
+        $this->dbhandler = new Database($config['database'], $config['links']);
+
         $this->srcDOM->load($filepath);
         $this->generateTag($this->srcDOM->documentElement, $this->destDOM);
         return utf8_encode($this->destDOM->saveXML());
     }
-    
+
+    protected function generateExceptionXML($e)
+    {
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $rootTag = $dom->createElement('error');
+        $rootTag->appendChild($dom->createElement('code', $e->getCode()));
+        $rootTag->appendChild($dom->createElement('message', $e->getMessage()));
+        $rootTag->appendChild($dom->createElement('file', $e->getFile()));
+        $rootTag->appendChild($dom->createElement('line', $e->getLine()));
+        $dom->appendChild($rootTag);
+        return $dom;
+    }
+
     protected function generateTag($src, &$par)
     {
         $func = $src->tagName.'ActionTag';
@@ -79,6 +87,9 @@ class sql2xml
         $tables = explode(';', $src->attributes->getNamedItem('tables')->value);
         $fields = array();
         foreach ($tables as $table) {
+            if (!isset($this->dbfields[$table]) || !count($this->dbfields[$table])) {
+                throw new Exception('No fields for table '.$table.'. Check database configuration', 1);
+            }
             foreach ($this->dbfields[$table] as $field) {
                 $fields[] = $table.'.'.$field;
             }
@@ -96,8 +107,11 @@ class sql2xml
         while ($item = $query->fetch()) {
             $this->objects[$name] = $item;
             $this->parseChildsTags($src, $par);
+            $this->objects[$name] = null;
             unset($this->objects[$name]);
         }
+        $query = null;
+        $request = null;
         unset($query, $request);
     }
 
@@ -111,8 +125,10 @@ class sql2xml
         foreach ($values as $item) {
             $this->values[$name] = $item;
             $this->parseChildsTags($src, $par);
+            $this->values[$name] = null;
             unset($this->values[$name]);
         }
+        $values = null;
     }
 
     public function ifActionTag($src, &$par)
@@ -241,6 +257,28 @@ class sql2xml
             }
         }
         return null;
+    }
+    
+    function contain($field, $contain)
+    {
+        if (strpos($field, $contain) !== false) {
+            return true;
+        }
+        return false;
+    }
+    
+    function boolTo($value, $type)
+    {
+        if ($value === true) {
+            if ($type == 'string') {
+                return 'true';
+            }
+            return 1;
+        }
+        if ($type == 'string') {
+            return 'false';
+        }
+        return 0;
     }
 }
 
